@@ -839,7 +839,7 @@ class Albumentations:
             T = [
                 A.Blur(p=0.01),
                 A.MedianBlur(p=0.01),
-                A.ToGray(p=0.01),
+                # A.ToGray(p=0.01),
                 A.CLAHE(p=0.01),
                 A.RandomBrightnessContrast(p=0.0),
                 A.RandomGamma(p=0.0),
