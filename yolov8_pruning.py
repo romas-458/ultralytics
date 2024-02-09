@@ -285,7 +285,8 @@ def prune(args):
     # this part is only for sample code, number of epochs should be included in config file    
     #pruning_cfg['data'] = "/home/***/Projects/***/data/exp11_crop1filter3_upperconerfilter0.15-0.25/data.yaml"
     pruning_cfg['data'] = args.data
-    pruning_cfg['epochs'] = 1
+    pruning_cfg['epochs'] = args.epochs
+    # pruning_cfg['epochs'] = 1
     #pruning_cfg['mosaic'] = False
 
     model.model.train()
@@ -398,6 +399,8 @@ if __name__ == "__main__":
     parser.add_argument('--target-prune-rate', default=0.5, type=float, help='Target pruning rate')
     parser.add_argument('--max-map-drop', default=0.2, type=float, help='Allowed maximum map drop after fine-tuning')
     parser.add_argument('--data', default='data.yaml', type=str, help='path to data.yaml')
+    parser.add_argument('--epochs', default=1, type=int, help='number epochs per iteration')
+
 
     args = parser.parse_args()
 
