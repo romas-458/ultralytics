@@ -841,7 +841,12 @@ class Albumentations:
                 A.MedianBlur(p=0.01),
                 # A.ToGray(p=0.01),
                 A.CLAHE(p=0.01),
-                A.RandomBrightnessContrast(p=0.0),
+                A.RandomBrightnessContrast(p=0.2),
+                A.ShiftScaleRotate(always_apply=False, p=0.5, shift_limit_x=(-0.0, 0.0), shift_limit_y=(-0.0, 0.0),
+                                   scale_limit=(-0.1, 0.0), rotate_limit=(-10, 10), border_mode=0),
+                # A.HueSaturationValue(always_apply=False, p=0.5, hue_shift_limit=(-20, 20), sat_shift_limit=(-30, 30),
+                #                      val_shift_limit=(-20, 20)),
+                A.GaussNoise(always_apply=False, p=0.5, var_limit=(10.0, 50.0), per_channel=True, mean=0.0),
                 A.RandomGamma(p=0.0),
                 A.ImageCompression(quality_lower=75, p=0.0),
             ]
