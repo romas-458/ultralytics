@@ -835,16 +835,39 @@ class Albumentations:
 
             check_version(A.__version__, "1.0.3", hard=True)  # version requirement
 
+            aug_num = 2
+            T = []
+            if aug_num in [0, 1, 2]:
+                T += [
+                    A.Blur(p=0.01),
+                    A.MedianBlur(p=0.01),
+                    # A.ToGray(p=0.01),
+                    A.CLAHE(p=0.01),
+                    A.RandomGamma(p=0.0),
+                    A.ImageCompression(quality_lower=75, p=0.0),
+                ]
+            if aug_num in [1, 2]:
+                T += [A.GaussNoise(always_apply=False, p=0.5, var_limit=(10.0, 50.0), per_channel=True, mean=0.0), ]
+
+            if aug_num in [1]:
+                T += [
+                    A.ShiftScaleRotate(always_apply=False, p=0.5, shift_limit_x=(-0.0, 0.0), shift_limit_y=(-0.0, 0.0),
+                                       scale_limit=(-0.1, 0.0), rotate_limit=(-10, 10), border_mode=0), ]
+            if aug_num in [2]:
+                T += [
+                    A.ShiftScaleRotate(always_apply=False, p=0.5, shift_limit_x=(-0.2, 0.2), shift_limit_y=(-0.2, 0.2),
+                                       scale_limit=(-0.2, 0.2), rotate_limit=(-20, 20))]
+
             # Transforms
-            T = [
-                A.Blur(p=0.01),
-                A.MedianBlur(p=0.01),
-                A.ToGray(p=0.01),
-                A.CLAHE(p=0.01),
-                A.RandomBrightnessContrast(p=0.0),
-                A.RandomGamma(p=0.0),
-                A.ImageCompression(quality_lower=75, p=0.0),
-            ]
+            # T = [
+            #     A.Blur(p=0.01),
+            #     A.MedianBlur(p=0.01),
+            #     A.ToGray(p=0.01),
+            #     A.CLAHE(p=0.01),
+            #     A.RandomBrightnessContrast(p=0.0),
+            #     A.RandomGamma(p=0.0),
+            #     A.ImageCompression(quality_lower=75, p=0.0),
+            # ]
             self.transform = A.Compose(T, bbox_params=A.BboxParams(format="yolo", label_fields=["class_labels"]))
 
             LOGGER.info(prefix + ", ".join(f"{x}".replace("always_apply=False, ", "") for x in T if x.p))
