@@ -51,6 +51,9 @@ from .conv import (
     LightConv,
     RepConv,
     SpatialAttention,
+    FastERBlock,
+    NAM,
+    FasterNetBlock
 )
 from .head import OBB, Classify, Detect, Pose, RTDETRDecoder, Segment
 from .transformer import (
@@ -114,4 +117,9 @@ __all__ = (
     "MLP",
     "ResNetLayer",
     "OBB",
+    "FastERBlock",
+    "NAM",
+    "FasterNetBlock"
+
 )
+
