@@ -40,7 +40,10 @@ from ultralytics.nn.modules import (
     ResNetLayer,
     RTDETRDecoder,
     Segment,
-    CBAM
+    CBAM,
+    FastERBlock,
+    NAM,
+    FasterNetBlock
 )
 from ultralytics.utils import DEFAULT_CFG_DICT, DEFAULT_CFG_KEYS, LOGGER, colorstr, emojis, yaml_load
 from ultralytics.utils.checks import check_requirements, check_suffix, check_yaml
@@ -811,6 +814,25 @@ def parse_model(d, ch, verbose=True):  # model_dict, input_channels(3)
             if c2 != nc:
                 c2 = make_divisible(min(c2, max_channels) * width, 8)
             args = [c1, *args[1:]]
+        elif m in {NAM}:
+            c1, c2 = ch[f], args[0]
+            if c2 != nc:
+                c2 = make_divisible(min(c2, max_channels) * width, 8)
+            args = [c1, *args[1:]]
+        elif m in {FasterNetBlock}:
+            c1, c2 = ch[f], args[0]  # Отримуємо вхідні та вихідні канали
+
+            # Нормалізуємо `c2` (якщо потрібно) під max_channels і width
+            if c2 != nc:
+                c2 = make_divisible(min(c2, max_channels) * width, 8)
+
+            # Передаємо оновлені аргументи
+            args = [c1, *args[1:]]
+        elif m in {FastERBlock}:
+            c1, c2 = ch[f], args[0] if len(args) > 0 else c1
+            c2 = max(8, make_divisible(min(c2, max_channels) * width, 8))  # Мінімальне значення 8
+            args = [c1, c2, *args[1:]]
+
         else:
             c2 = ch[f]
 
