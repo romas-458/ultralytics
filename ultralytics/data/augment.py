@@ -835,28 +835,86 @@ class Albumentations:
 
             check_version(A.__version__, "1.0.3", hard=True)  # version requirement
 
-            aug_num = 2
+            aug_num = 7
             T = []
-            if aug_num in [0, 1, 2]:
+            if aug_num in [0, 1, 2, 3, 4, 5, 6, 7]:
                 T += [
                     A.Blur(p=0.01),
                     A.MedianBlur(p=0.01),
-                    # A.ToGray(p=0.01),
+                    A.ToGray(p=0.01),
                     A.CLAHE(p=0.01),
                     A.RandomGamma(p=0.0),
                     A.ImageCompression(quality_lower=75, p=0.0),
                 ]
-            if aug_num in [1, 2]:
-                T += [A.GaussNoise(always_apply=False, p=0.5, var_limit=(10.0, 50.0), per_channel=True, mean=0.0), ]
 
             if aug_num in [1]:
                 T += [
                     A.ShiftScaleRotate(always_apply=False, p=0.5, shift_limit_x=(-0.0, 0.0), shift_limit_y=(-0.0, 0.0),
                                        scale_limit=(-0.1, 0.0), rotate_limit=(-10, 10), border_mode=0), ]
-            if aug_num in [2]:
+            if aug_num in [7]:
+                T += [
+                    A.ShiftScaleRotate(always_apply=False, p=0.5, shift_limit_x=(-0.0, 0.0), shift_limit_y=(-0.0, 0.0),
+                                       scale_limit=(-0.05, 0.1), rotate_limit=(-10, 10), border_mode=0),
+                    # A.VerticalFlip(p=0.2),
+                ]
+
+            if aug_num in [2, 3, 5, 6]:
                 T += [
                     A.ShiftScaleRotate(always_apply=False, p=0.5, shift_limit_x=(-0.2, 0.2), shift_limit_y=(-0.2, 0.2),
                                        scale_limit=(-0.2, 0.2), rotate_limit=(-20, 20))]
+
+            if aug_num in [1, 2, 3, 6]:
+                T += [A.GaussNoise(always_apply=False, p=0.5, var_limit=(10.0, 50.0), per_channel=True, mean=0.0), ]
+
+            if aug_num in [3]:
+                T += [
+                    # 1. Зміна яскравості та контрасту (імітація різних умов освітлення)
+                    A.RandomBrightnessContrast(p=0.3),
+
+                    # 2. Адаптивне розмиття (імітація руху UAV або тремтіння камери)
+                    A.MotionBlur(p=0.2),
+
+                    # 3. Гауссовий шум (імітація завад у камері)
+                    # A.GaussNoise(var_limit=(10.0, 50.0), p=0.3),
+
+                    # 4. Змінення тону (імітація різних погодних умов)
+                    A.HueSaturationValue(hue_shift_limit=10, sat_shift_limit=15, val_shift_limit=10, p=0.3),
+
+                    # 5. Фліпи (віддзеркалення UAV для покращення генералізації)
+                    A.HorizontalFlip(p=0.5),
+                    A.VerticalFlip(p=0.2),
+
+                    # 6. Рандомне обрізання частини зображення (імітація часткових об'єктів)
+                    # A.RandomResizedCrop(height=IMG_SIZE, width=IMG_SIZE, scale=(0.8, 1.0), ratio=(0.75, 1.33), p=0.2),
+
+                    # 7. Афінні перетворення (імітація зміни ракурсу UAV)
+                    A.Affine(scale=(0.9, 1.1), translate_percent=(0.1, 0.2), rotate=(-15, 15), shear=(-10, 10), p=0.3),
+
+                    # 8. Розмиття та ефект спотворення
+                    A.GlassBlur(sigma=0.1, max_delta=2, iterations=2, p=0.2),
+
+                    # 9. Деформація перспективи (імітація різних ракурсів камери)
+                    A.Perspective(scale=(0.05, 0.15), p=0.3),
+                    ]
+
+            if aug_num in [4, 5, 6, 7]:
+                T += [
+                    # 1. Зміна яскравості та контрасту (імітація різних умов освітлення)
+                    A.RandomBrightnessContrast(p=0.3),
+
+                    # 4. Змінення тону (імітація різних погодних умов)
+                    A.HueSaturationValue(hue_shift_limit=10, sat_shift_limit=15, val_shift_limit=10, p=0.3),
+
+                    ]
+
+            if aug_num in [6]:
+                T += [
+
+                    # 2. Адаптивне розмиття (імітація руху UAV або тремтіння камери)
+                    A.MotionBlur(p=0.2),
+
+                    ]
+
 
             # Transforms
             # T = [
