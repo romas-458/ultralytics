@@ -809,6 +809,45 @@ class CBAM(nn.Module):
     def forward(self, x):
         return self.spatial_attention(self.channel_attention(x))
 
+# class ChannelAttention(nn.Module):
+#     def __init__(self, channels: int, scale=0.2):
+#         super().__init__()
+#         self.pool = nn.AdaptiveAvgPool2d(1)  # Global Average Pooling
+#         self.fc = nn.Conv2d(channels, channels, 1, bias=True)
+#         self.act = nn.Hardsigmoid()  # Оптимізована версія Sigmoid
+#         self.scale = scale
+#
+#     def forward(self, x: torch.Tensor) -> torch.Tensor:
+#         attention = self.act(self.fc(self.pool(x)))
+#         return x * (1 + self.scale * attention)  # Більш стабільна нормалізація
+#
+#
+# class SpatialAttention(nn.Module):
+#     def __init__(self, kernel_size=7, scale=0.2):
+#         super().__init__()
+#         assert kernel_size in (3, 7), "kernel size must be 3 or 7"
+#         padding = 3 if kernel_size == 7 else 1
+#         self.conv = nn.Conv2d(2, 1, kernel_size, padding=padding, bias=False)
+#         self.act = nn.Hardsigmoid()
+#         self.scale = scale
+#
+#     def forward(self, x):
+#         attention = self.act(self.conv(torch.cat([
+#             torch.mean(x, dim=1, keepdim=True),
+#             torch.max(x, dim=1, keepdim=True)[0]
+#         ], dim=1)))
+#         return x * (1 + self.scale * attention)  # Використання множення для стабільності
+#
+#
+# class CBAM(nn.Module):
+#     def __init__(self, c1, kernel_size=7, attention_scale=0.2, channel_scale=0.2):
+#         super().__init__()
+#         self.channel_attention = ChannelAttention(c1, scale=channel_scale)
+#         self.spatial_attention = SpatialAttention(kernel_size, scale=attention_scale)
+#
+#     def forward(self, x):
+#         return self.spatial_attention(self.channel_attention(x))
+#
 class Concat(nn.Module):
     """Concatenate a list of tensors along dimension."""
 
