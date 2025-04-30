@@ -32,6 +32,7 @@ from ultralytics.nn.modules import (
     C2f_SA,
     C2f_CBAM_Res,
     C2f_ICBAM,
+    C2f_LSKA,
     C3Ghost,
     C3x,
     Classify,
@@ -799,6 +800,7 @@ def parse_model(d, ch, verbose=True):  # model_dict, input_channels(3)
             C2f_SA,
             C2f_CBAM_Res,
             C2f_ICBAM,
+            C2f_LSKA,
             C3,
             C3TR,
             C3Ghost,
@@ -813,7 +815,7 @@ def parse_model(d, ch, verbose=True):  # model_dict, input_channels(3)
 
             args = [c1, c2, *args[1:]]
             if m in (BottleneckCSP, C1, C2, C2f, C2f_CBAM_Light, C2f_CBAM, C2f_Light, C2f_Light2, C2f_SE, C2f_ICBAM,
-                     C3, C3TR,
+                     C3, C3TR, C2f_LSKA,
                      C3Ghost, C3x, RepC3):
                 args.insert(2, n)  # number of repeats
                 n = 1

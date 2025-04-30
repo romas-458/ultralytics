@@ -41,6 +41,7 @@ from .block import (
     C2f_SA,
     C2f_CBAM_Res,
     C2f_ICBAM,
+    C2f_LSKA,
     C3Ghost,
     C3x,
     GhostBottleneck,
@@ -132,7 +133,8 @@ __all__ = (
     "OBB",
     "FastERBlock",
     "NAM",
-    "FasterNetBlock"
+    "FasterNetBlock",
+    "C2f_LSKA",
 
 )
 

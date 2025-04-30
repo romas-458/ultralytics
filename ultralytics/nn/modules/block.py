@@ -31,6 +31,7 @@ __all__ = (
     "C2f_SA",
     "C2f_CBAM_Res",
     "C2f_ICBAM",
+    "C2f_LSKA",
     "C3x",
     "C3TR",
     "C3Ghost",
@@ -968,3 +969,46 @@ class ResNetLayer(nn.Module):
     def forward(self, x):
         """Forward pass through the ResNet layer."""
         return self.layer(x)
+
+
+class LSKA(nn.Module):
+    """Large Separable Kernel Attention (LSKA)"""
+
+    def __init__(self, c1, c2, k_size=7):
+        super().__init__()
+        self.conv0h = nn.Conv2d(c1, c2, kernel_size=(1, 3), stride=1, padding=(0, 1), groups=c1)
+        self.conv0v = nn.Conv2d(c1, c2, kernel_size=(3, 1), stride=1, padding=(1, 0), groups=c1)
+        self.conv_spatial_h = nn.Conv2d(c1, c2, kernel_size=(1, 3), stride=1, padding=(0, 2), groups=c1, dilation=2)
+        self.conv_spatial_v = nn.Conv2d(c1, c2, kernel_size=(3, 1), stride=1, padding=(2, 0), groups=c1, dilation=2)
+        self.conv1 = nn.Conv2d(c1, c2, kernel_size=1)
+
+    def forward(self, x):
+        u = x.clone()
+        attn = self.conv0h(x)
+        attn = self.conv0v(attn)
+        attn = self.conv_spatial_h(attn)
+        attn = self.conv_spatial_v(attn)
+        attn = self.conv1(attn)
+        return u * attn
+
+
+class C2f_LSKA(nn.Module):
+    """Cross-Stage Partial Fusion (C2f) with LSKA"""
+
+    def __init__(self, c1, c2, n=1, shortcut=False, g=1, e=0.5):
+        super().__init__()
+        self.c = int(c2 * e)  # Hidden channels
+        self.cv1 = Conv(c1, 2 * self.c, 1, 1)  # Вхідний Conv
+        self.m = nn.ModuleList([Bottleneck(self.c, self.c, shortcut, g) for _ in range(n)])
+        self.cv2 = Conv((2 + n) * self.c, c2, 1, 1)  # Вихідний Conv
+        self.lska = LSKA(c2, c2)  # Додаємо LSKA
+
+    def forward(self, x):
+        """Forward pass через C2f + LSKA"""
+        y = list(self.cv1(x).chunk(2, 1))  # Розділення вхідного тензора на 2 частини
+
+        for m in self.m:
+            y.append(m(y[-1]))  # Генерація нових ознак
+
+        x = self.cv2(torch.cat(y, 1))  # Конкатенація та приведення розміру каналів
+        return self.lska(x)  # Додаємо LSKA
